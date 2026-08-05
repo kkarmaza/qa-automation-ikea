@@ -1,9 +1,5 @@
 import { expect } from "@playwright/test";
 import { test } from "../../fixtures/custom-fixtures";
-import { GlobalJobsPage } from "../pages/GlobalJobsPage";
-import { JobsPage } from "../pages/JobsPage";
-import { SearchResultPage } from "../pages/SearchResultPage";
-import { JobPage } from "../pages/JobPage";
 import { randomEmail } from "../../utils/randomData";
 import { requireEnv } from "../../utils/envCheck";
 
@@ -22,11 +18,16 @@ Scenario 1: Search for a job
 11. Click on 'Saved jobs' element
 12. Check that the job title in 'Saved jobs' is 'Manager'*/
 
-const baseUrl =  requireEnv("BASE_URL");
+const baseUrl = requireEnv("BASE_URL");
 
-test("Search for a job", async ({ page, homePage }) => {
-  let searchResultPage: SearchResultPage;
-  const jobPage = new JobPage(page);
+test("Search for a job", async ({
+  page,
+  homePage,
+  globalJobsPage,
+  jobsPage,
+  jobPage,
+  searchResultPage,
+}) => {
   let searchInput = "Manager";
   const fallbackSearchInput = "Designer";
 
@@ -36,22 +37,21 @@ test("Search for a job", async ({ page, homePage }) => {
   });
 
   await test.step("Search for the available jobs", async () => {
-    const globalJobPage = new GlobalJobsPage(page);
-    await globalJobPage.openAvailableJobsPage();
+    await globalJobsPage.openAvailableJobsPage();
     await expect(page).toHaveURL(/\/jobs.ikea.com\/en/);
-    const jobsPage = new JobsPage(page);
     //without accepting cookies Save button isn't visible
     await jobsPage.acceptCookies();
 
     await jobsPage.searchJobs(searchInput);
+    await expect(searchResultPage.searchResults).toBeVisible();
     await expect(page).toHaveURL(
       new RegExp(`/jobs\\.ikea\\.com/en/search-jobs/${searchInput}/`),
     );
-    searchResultPage = new SearchResultPage(page);
     //If search returns 0 jobs, search again with a fallback job title
     if ((await searchResultPage.getJobsCount()) === 0) {
       searchInput = fallbackSearchInput;
       await jobsPage.searchJobs(searchInput);
+      await expect(searchResultPage.searchResults).toBeVisible();
       await expect(page).toHaveURL(
         new RegExp(`/jobs\\.ikea\\.com/en/search-jobs/${searchInput}/`),
       );
@@ -87,20 +87,23 @@ test("Search for a job", async ({ page, homePage }) => {
 6. Input Location and choose it in dropdown
 7. Click on 'Sign up' and check confirmation message*/
 
-test("Subscribe for a job ", async ({ page, homePage }) => {
+test("Subscribe for a job ", async ({
+  page,
+  homePage,
+  globalJobsPage,
+  jobsPage,
+}) => {
   await test.step("Navigate to IKEA website", async () => {
     await homePage.openJobPage();
     await expect(page).toHaveURL(`${baseUrl}/global/en/jobs/`);
   });
 
   await test.step("Navigate to Available Jobs Page", async () => {
-    const globalJobPage = new GlobalJobsPage(page);
-    await globalJobPage.openAvailableJobsPage();
+    await globalJobsPage.openAvailableJobsPage();
     await expect(page).toHaveURL(/\/jobs.ikea.com\/en/);
   });
 
   await test.step("Verify subscription functionality", async () => {
-    const jobsPage = new JobsPage(page);
     await jobsPage.rejectCookies();
     await jobsPage.emailInput.fill(randomEmail());
     const selectedCategory = "Administration & Support Services";
@@ -127,9 +130,13 @@ test("Subscribe for a job ", async ({ page, homePage }) => {
 7. Verify that "results for" title includes selected categoty
 8. Verify that each job has selected Category*/
 
-test("Search for a job by category", async ({ page, homePage }) => {
-  const jobsPage = new JobsPage(page);
-  const searchResultPage = new SearchResultPage(page);
+test("Search for a job by category", async ({
+  page,
+  homePage,
+  globalJobsPage,
+  jobsPage,
+  searchResultPage,
+}) => {
   let selectedCategoryName: string;
   let selectedAcmValue: string;
 
@@ -139,8 +146,7 @@ test("Search for a job by category", async ({ page, homePage }) => {
   });
 
   await test.step("Navigate to Available Jobs Page", async () => {
-    const globalJobPage = new GlobalJobsPage(page);
-    await globalJobPage.openAvailableJobsPage();
+    await globalJobsPage.openAvailableJobsPage();
     await expect(page).toHaveURL(/\/jobs.ikea.com\/en/);
     await jobsPage.rejectCookies();
   });
