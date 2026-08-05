@@ -5,6 +5,7 @@ import { JobsPage } from "../pages/JobsPage";
 import { SearchResultPage } from "../pages/SearchResultPage";
 import { JobPage } from "../pages/JobPage";
 import { randomEmail } from "../../utils/randomData";
+import { requireEnv } from "../../utils/envCheck";
 
 /*
 Scenario 1: Search for a job
@@ -21,6 +22,8 @@ Scenario 1: Search for a job
 11. Click on 'Saved jobs' element
 12. Check that the job title in 'Saved jobs' is 'Manager'*/
 
+const baseUrl =  requireEnv("BASE_URL");
+
 test("Search for a job", async ({ page, homePage }) => {
   let searchResultPage: SearchResultPage;
   const jobPage = new JobPage(page);
@@ -29,7 +32,7 @@ test("Search for a job", async ({ page, homePage }) => {
 
   await test.step("Navigate to IKEA website", async () => {
     await homePage.openJobPage();
-    await expect(page).toHaveURL(/\/global\/en\/jobs\//);
+    await expect(page).toHaveURL(`${baseUrl}/global/en/jobs/`);
   });
 
   await test.step("Search for the available jobs", async () => {
@@ -87,7 +90,7 @@ test("Search for a job", async ({ page, homePage }) => {
 test("Subscribe for a job ", async ({ page, homePage }) => {
   await test.step("Navigate to IKEA website", async () => {
     await homePage.openJobPage();
-    await expect(page).toHaveURL(/\/global\/en\/jobs\//);
+    await expect(page).toHaveURL(`${baseUrl}/global/en/jobs/`);
   });
 
   await test.step("Navigate to Available Jobs Page", async () => {
@@ -132,7 +135,7 @@ test("Search for a job by category", async ({ page, homePage }) => {
 
   await test.step("Navigate to IKEA website", async () => {
     await homePage.openJobPage();
-    await expect(page).toHaveURL(/\/global\/en\/jobs\//);
+    await expect(page).toHaveURL(`${baseUrl}/global/en/jobs/`);
   });
 
   await test.step("Navigate to Available Jobs Page", async () => {
