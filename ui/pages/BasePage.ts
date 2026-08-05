@@ -1,4 +1,4 @@
-import { Locator, Page } from "@playwright/test";
+import { Page } from "@playwright/test";
 import { Header } from "./elements/Header";
 import { CookieBanner } from "./elements/CookieBanner";
 
