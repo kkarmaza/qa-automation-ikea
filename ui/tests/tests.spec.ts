@@ -19,6 +19,7 @@ Scenario 1: Search for a job
 12. Check that the job title in 'Saved jobs' is 'Manager'*/
 
 const baseUrl = requireEnv("BASE_URL");
+const baseJobsUrl = requireEnv("BASE_JOBS_URL");
 
 test("Search for a job", async ({
   page,
@@ -38,7 +39,7 @@ test("Search for a job", async ({
 
   await test.step("Search for the available jobs", async () => {
     await globalJobsPage.openAvailableJobsPage();
-    await expect(page).toHaveURL(/\/jobs.ikea.com\/en/);
+    await expect(page).toHaveURL(`${baseJobsUrl}`);
     //without accepting cookies Save button isn't visible
     await jobsPage.acceptCookies();
 
@@ -53,7 +54,7 @@ test("Search for a job", async ({
       await jobsPage.searchJobs(searchInput);
       await expect(searchResultPage.searchResults).toBeVisible();
       await expect(page).toHaveURL(
-        new RegExp(`/jobs\\.ikea\\.com/en/search-jobs/${searchInput}/`),
+        new RegExp(`${baseJobsUrl}/search-jobs/${searchInput}/`),
       );
     }
   });
@@ -100,7 +101,7 @@ test("Subscribe for a job ", async ({
 
   await test.step("Navigate to Available Jobs Page", async () => {
     await globalJobsPage.openAvailableJobsPage();
-    await expect(page).toHaveURL(/\/jobs.ikea.com\/en/);
+    await expect(page).toHaveURL(`${baseJobsUrl}`);
   });
 
   await test.step("Verify subscription functionality", async () => {
@@ -147,7 +148,7 @@ test("Search for a job by category", async ({
 
   await test.step("Navigate to Available Jobs Page", async () => {
     await globalJobsPage.openAvailableJobsPage();
-    await expect(page).toHaveURL(/\/jobs.ikea.com\/en/);
+    await expect(page).toHaveURL(`${baseJobsUrl}`);
     await jobsPage.rejectCookies();
   });
 
